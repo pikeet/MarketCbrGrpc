@@ -1,0 +1,37 @@
+syntax="proto3";
+
+package cbr;
+
+message Empty{
+
+}
+
+message RequestCreate{
+
+}
+
+message RequestFindById{
+    int32 code = 1;
+}
+
+message ResponseFindAll{
+    string statusCode = 1;
+    repeated CurrencyObject currency = 2;
+}
+
+message ResponseFindByCode{
+    string statusCode = 1;
+    repeated CurrencyObject currency = 2;
+}
+
+message CurrencyObject {
+    string name = 1;
+    int32 code = 2;
+    int32 value = 3;
+}
+
+service CbrGrpcServices {
+    rpc FindAll (Empty) returns (ResponseFindAll){}
+    rpc FindByCode (RequestFindById) returns (ResponseFindByCode){}
+    rpc Create (Empty) returns (Empty){}
+}
