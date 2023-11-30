@@ -12,6 +12,9 @@ export class CbrModel{
     @Column()
     name: string
 
+    @Column()
+    prefix: string;
+
     @Column({type: "float", nullable: false})
     value: number
 

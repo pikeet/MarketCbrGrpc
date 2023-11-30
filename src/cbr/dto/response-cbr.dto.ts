@@ -1,4 +1,4 @@
-import { ICurrency } from "./currency.model";
+import { ICurrency } from "../model/currency.model";
 
 export interface IResponseCurrency{
     statusCode: string;
