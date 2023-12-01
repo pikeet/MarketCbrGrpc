@@ -72,7 +72,7 @@ export class CbrService {
         const cbr =  await this.DB.getRepository(CbrModel).createQueryBuilder().select().where('id = :id', {id: id}).getOne();
         return {
           statusCode: 'OK',
-          currency: cbr
+          currency: [cbr]
         }
     }catch(e){
       console.log(e)
