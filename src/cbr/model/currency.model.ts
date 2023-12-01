@@ -1,5 +1,6 @@
 export interface ICurrency{
+    id: number;
     name: string;
-    code: number;
+    prefix: string;
     value: number;
 }

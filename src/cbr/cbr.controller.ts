@@ -33,7 +33,14 @@ export class CbrController {
 
   @GrpcMethod('CbrGrpcServices', 'Update')
   Update() {
-    return this.cbrService.update();
+    try{
+      const res = this.cbrService.update();
+      return {
+        statusCode: 'OK',
+      };
+    }catch(e){
+
+    }
   }
   
 }

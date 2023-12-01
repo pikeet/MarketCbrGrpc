@@ -9,11 +9,32 @@ import { xml2json } from 'xml-js';
 import { ICbr } from './model/cbr.model';
 import { isUtf8 } from 'buffer';
 import { Stream } from 'stream';
+import { ICurrency } from './model/currency.model';
+import { CbrFacture } from './types/cbr.type';
 
 @Injectable()
 export class CbrService {
 
   constructor(@InjectDataSource() private DB: DataSource){}
+
+  async transformer (data:any){
+    let cbr : ICurrency[] = []
+    const toJson :ICbr = JSON.parse(xml2json(data, {spaces:1, compact: true}))
+
+    toJson.ValCurs.Valute.map(valute => {
+
+      if(CbrFacture[Number(valute.NumCode._text)]){
+          cbr.push({
+            id: Number(valute?.NumCode._text),
+            name: CbrFacture[Number(valute.NumCode._text)],
+            prefix: valute.CharCode._text,
+            value: parseFloat(valute.Value._text.replace(',', '.'))
+        })
+      }
+    })
+
+    return cbr;
+  }
 
 
   async create() {
@@ -24,22 +45,14 @@ export class CbrService {
         }
     })
 
-    let cbr:any = []
-    const cbr_json:ICbr = JSON.parse(xml2json(response.data, {spaces:1, compact: true}))
-    cbr_json.ValCurs.Valute.map(valute => {
-      console.log(valute.Name._text.toString());
-        cbr.push({
-                id: Number(valute?.NumCode._text),
-                name: valute.Name._text,
-                prefix: valute?.CharCode._text,
-                value: parseFloat(valute.Value._text.replace(',', '.'))
-            })
-        })
-
-    await this.DB.getRepository(CbrModel).createQueryBuilder().insert().into(CbrModel).values([...cbr]).execute()
-    return {
-        statusText: "OK"
-    }
+   return this.transformer(response.data)
+   .then(async data => {
+      await this.DB.getRepository(CbrModel).createQueryBuilder().insert().into(CbrModel).values(data).execute()
+      return {
+          statusText: "OK"
+      }
+   
+   }) 
   }
 
   async findAll() {
@@ -74,19 +87,22 @@ export class CbrService {
           }
       })
 
-      const cbr_json:ICbr = JSON.parse(xml2json(response.data, {spaces:1, compact: true}))
+     return this.transformer(response.data)
+     .then(data => {
 
-      cbr_json.ValCurs.Valute.map(valute => (
-          this.DB.getRepository(CbrModel).createQueryBuilder().update().set({
-                  name: valute?.CharCode._text,
-                  value: parseFloat(valute.Value._text.replace(',', '.'))
-      }).where('id = :code', {id: Number(valute.NumCode._text)}).execute()
-        
-      ))
+        data.map(d => (
+            this.DB.getRepository(CbrModel).createQueryBuilder().update().set({
+                    name: d.name,
+                    prefix: d.prefix,
+                    value: d.value
+        }).where('id = :id', {id: Number(d.id)}).execute()
+          
+        ))
 
-      return {
-          statusText: "OK"
-      }
+        return {
+            statusText: "OK"
+        }
+     })
   }
 
   remove(id: number) {

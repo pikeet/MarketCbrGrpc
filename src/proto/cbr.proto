@@ -24,6 +24,10 @@ message ResponseFindByCode{
     repeated CurrencyObject currency = 2;
 }
 
+message ResponseStatus{
+    string statusCode = 1;
+}
+
 message CurrencyObject {
     int32 id = 1;
     string name = 2;
@@ -33,5 +37,6 @@ message CurrencyObject {
 service CbrGrpcServices {
     rpc FindAll (Empty) returns (ResponseFindAll){}
     rpc FindByCode (RequestFindById) returns (ResponseFindByCode){}
-    rpc Create (Empty) returns (Empty){}
+    rpc Create (Empty) returns (ResponseStatus){}
+    rpc Update (Empty) returns (ResponseStatus){}
 }
