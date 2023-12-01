@@ -1,31 +1,46 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod, MessagePattern, Payload } from '@nestjs/microservices';
 import { CbrService } from './cbr.service';
-import { CreateCbrDto } from './dto/create-cbr.dto';
 import { UpdateCbrDto } from './dto/update-cbr.dto';
+import { FindByIdDto } from './dto/find-by-id.dto';
 
 @Controller()
 export class CbrController {
   constructor(private readonly cbrService: CbrService) {}
 
-  @GrpcMethod('Create')
-  create(@Payload() createCbrDto: CreateCbrDto) {
-    return this.cbrService.create(createCbrDto);
+  @GrpcMethod('CbrGrpcServices', 'Create')
+  async Create() {
+    const res = await this.cbrService.create();
+    return {
+      statusCode: 'OK',
+    };
   }
 
-  @GrpcMethod('FindAll')
-  findAll() {
+  @GrpcMethod('CbrGrpcServices', 'FindAll')
+  FindAll() {
     return this.cbrService.findAll();
   }
 
-  @GrpcMethod('FindByCode')
-  findOne(@Payload() id: number) {
-    return this.cbrService.findOne(id);
+  @GrpcMethod('CbrGrpcServices', 'FindByCode')
+  FindByCode(code: FindByIdDto) {
+    try{
+        return this.cbrService.findOne(code.code);
+    }
+    catch(e){
+      console.log(e)
+    }
   }
 
-  @GrpcMethod('Update')
-  update(@Payload() updateCbrDto: UpdateCbrDto) {
-    return this.cbrService.update(updateCbrDto.id, updateCbrDto);
+  @GrpcMethod('CbrGrpcServices', 'Update')
+  Update() {
+    try{
+      const res = this.cbrService.update();
+      return {
+        statusCode: 'OK',
+      };
+    }catch(e){
+
+    }
   }
   
 }

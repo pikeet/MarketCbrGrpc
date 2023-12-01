@@ -24,14 +24,19 @@ message ResponseFindByCode{
     repeated CurrencyObject currency = 2;
 }
 
+message ResponseStatus{
+    string statusCode = 1;
+}
+
 message CurrencyObject {
-    string name = 1;
-    int32 code = 2;
+    int32 id = 1;
+    string name = 2;
     int32 value = 3;
 }
 
 service CbrGrpcServices {
     rpc FindAll (Empty) returns (ResponseFindAll){}
     rpc FindByCode (RequestFindById) returns (ResponseFindByCode){}
-    rpc Create (Empty) returns (Empty){}
+    rpc Create (Empty) returns (ResponseStatus){}
+    rpc Update (Empty) returns (ResponseStatus){}
 }
